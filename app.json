@@ -1,0 +1,31 @@
+﻿{
+    "expo":  {
+                 "name":  "PulseHub",
+                 "slug":  "pulsehub",
+                 "version":  "1.0.0",
+                 "orientation":  "portrait",
+                 "userInterfaceStyle":  "automatic",
+                 "splash":  {
+                                "backgroundColor":  "#0F0F1A"
+                            },
+                 "assetBundlePatterns":  [
+                                             "**/*"
+                                         ],
+                 "ios":  {
+                             "supportsTablet":  true,
+                             "bundleIdentifier":  "com.pulsehub.app"
+                         },
+                 "android":  {
+                                 "package":  "com.pulsehub.app",
+                                 "permissions":  [
+                                                     "CAMERA",
+                                                     "RECORD_AUDIO"
+                                                 ]
+                             },
+                 "plugins":  [
+                                 "expo-camera",
+                                 "expo-notifications",
+                                 "expo-av"
+                             ]
+             }
+}
