@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import { supabase } from "../utils/supabase";
@@ -46,10 +46,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signUp = async ({ name, handle, email, password, referralCode }) => {
+  const signUp = async ({ name, handle, email, password, referralCode = "" }) => {
     const cleanHandle = handle.trim().toLowerCase().replace("@", "");
 
     try {
+      // 1. Duplicate Username/Handle Check
       const { data: existing } = await supabase
         .from("users")
         .select("id")
@@ -57,10 +58,11 @@ export function AuthProvider({ children }) {
         .maybeSingle();
 
       if (existing) {
-        Alert.alert("Handle Taken", "This handle is already registered. Try another one.");
+        Alert.alert("Handle Taken", "This handle (@" + cleanHandle + ") is already registered. Please choose another one.");
         throw new Error("Handle taken");
       }
 
+      // 2. Supabase Auth Signup
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
@@ -68,7 +70,7 @@ export function AuthProvider({ children }) {
           data: {
             name: name.trim() || "New User",
             handle: cleanHandle,
-            referral_code: referralCode.trim().toUpperCase() || null,
+            referral_code: referralCode.trim().toUpperCase() || "",
           },
         },
       });
@@ -79,16 +81,37 @@ export function AuthProvider({ children }) {
       if (!authUser) throw new Error("Sign up failed");
 
       if (authData.session) {
-        const { data: profile, error: profileError } = await supabase
+        // Fetch or create profile fallback
+        let { data: profile } = await supabase
           .from("users")
           .select("*")
           .eq("id", authUser.id)
-          .single();
-        if (profileError) throw profileError;
+          .maybeSingle();
+
+        if (!profile) {
+          // Manual fallback insert if trigger was delayed
+          const refCode = authUser.id.substring(0, 8).toUpperCase();
+          const { data: newProfile } = await supabase
+            .from("users")
+            .insert({
+              id: authUser.id,
+              handle: cleanHandle,
+              name: name.trim() || "New User",
+              avatar: "⚡",
+              bio: "Hey there! I am using PulseHub.",
+              sparks: 50,
+              referral_code: refCode,
+            })
+            .select()
+            .single();
+
+          profile = newProfile;
+        }
+
         await persist(profile);
-        await registerPushToken(profile.id);
+        if (profile?.id) await registerPushToken(profile.id);
       } else {
-        Alert.alert("Verify Email", "Verification email sent. Please check your inbox before logging in.");
+        Alert.alert("Account Created! 📧", "A verification email has been sent to " + email + ". Please confirm your email to complete registration.");
       }
 
       return { needsEmailVerification: !authData.session };
