@@ -1,8 +1,9 @@
-﻿{
+{
     "expo":  {
                  "name":  "PulseHub",
                  "slug":  "pulsehub",
                  "version":  "1.0.0",
+                 "scheme":  "pulsehub",
                  "orientation":  "portrait",
                  "userInterfaceStyle":  "automatic",
                  "splash":  {
