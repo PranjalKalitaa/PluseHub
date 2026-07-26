@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert } from "react-native";
-import { supabase } from "../utils/supabase";
+import { Alert, Linking } from "react-native";
+import { AUTH_REDIRECT_URL, supabase } from "../utils/supabase";
 import { registerPushToken } from "../utils/notifications";
 
 const AuthContext = createContext(null);
@@ -37,6 +37,29 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
+
+  useEffect(() => {
+    const completeAuthRedirect = async (url) => {
+      if (!url?.startsWith(AUTH_REDIRECT_URL)) return;
+      try {
+        const parsedUrl = new URL(url);
+        const params = new URLSearchParams(`${parsedUrl.search}${parsedUrl.hash.replace("#", "&")}`);
+        const code = params.get("code");
+        const accessToken = params.get("access_token");
+        const refreshToken = params.get("refresh_token");
+        const { error } = code
+          ? await supabase.auth.exchangeCodeForSession(url)
+          : await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (error) throw error;
+      } catch (error) {
+        console.error("Unable to complete authentication redirect", error);
+        Alert.alert("Sign-in link failed", "This link is invalid or has expired. Please request a new one.");
+      }
+    };
+    Linking.getInitialURL().then(completeAuthRedirect);
+    const subscription = Linking.addEventListener("url", ({ url }) => completeAuthRedirect(url));
+    return () => subscription.remove();
+  }, []);
   const persist = async (nextUser) => {
     setUser(nextUser);
     if (nextUser) {
@@ -67,6 +90,7 @@ export function AuthProvider({ children }) {
         email: email.trim().toLowerCase(),
         password,
         options: {
+          emailRedirectTo: AUTH_REDIRECT_URL,
           data: {
             name: name.trim() || "New User",
             handle: cleanHandle,
@@ -155,6 +179,37 @@ export function AuthProvider({ children }) {
     }
   };
 
+
+  const sendEmailSignInLink = async (email) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: { emailRedirectTo: AUTH_REDIRECT_URL, shouldCreateUser: false },
+      });
+      if (error) throw error;
+      Alert.alert("Email sent", "Open the sign-in link on this phone to continue.");
+    } catch (error) {
+      console.error("Email sign-in link error", error);
+      Alert.alert("Could not send link", error.message || "Try again in a moment.");
+      throw error;
+    }
+  };
+
+  const logInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: AUTH_REDIRECT_URL, skipBrowserRedirect: true },
+      });
+      if (error) throw error;
+      if (!data?.url) throw new Error("Google sign-in could not be started.");
+      await Linking.openURL(data.url);
+    } catch (error) {
+      console.error("Google sign-in error", error);
+      Alert.alert("Google sign-in failed", error.message || "Try again in a moment.");
+      throw error;
+    }
+  };
   const logOut = async () => {
     await supabase.auth.signOut();
     await persist(null);
@@ -177,6 +232,9 @@ export function AuthProvider({ children }) {
   const updateUser = async (patch) => {
     if (!user) return;
     try {
+      const updated = { ...user, ...patch };
+      await persist(updated);
+
       const { data, error } = await supabase
         .from("users")
         .update(patch)
@@ -185,9 +243,11 @@ export function AuthProvider({ children }) {
         .single();
 
       if (error) throw error;
-      await persist(data);
+      if (data) await persist(data);
+      return data || updated;
     } catch (error) {
       console.error("Update profile error", error);
+      throw error;
     }
   };
 
@@ -197,7 +257,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, logIn, logOut, updateUser, addSparks, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, signUp, logIn, sendEmailSignInLink, logInWithGoogle, logOut, updateUser, addSparks, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );

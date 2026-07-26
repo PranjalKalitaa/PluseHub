@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import { colors, spacing, typography, radius } from "../../theme/colors";
 
 export default function LoginScreen({ navigation }) {
-  const { logIn } = useAuth();
+  const { logIn, sendEmailSignInLink, logInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -35,6 +35,31 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
+
+  const hasValidEmail = () => {
+    if (email.trim().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) return true;
+    setErrors((current) => ({ ...current, email: "Enter a valid email address first." }));
+    return false;
+  };
+
+  const onEmailLinkPress = async () => {
+    if (!hasValidEmail()) return;
+    setSubmitting(true);
+    try {
+      await sendEmailSignInLink(email);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onGooglePress = async () => {
+    setSubmitting(true);
+    try {
+      await logInWithGoogle();
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
@@ -82,7 +107,9 @@ export default function LoginScreen({ navigation }) {
             <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "600" }}>Forgot Password?</Text>
           </TouchableOpacity>
 
-      <Button title="Log in" onPress={onSubmit} loading={submitting} style={{ marginTop: spacing.md }} />
+      <Button title="Log in with password" onPress={onSubmit} loading={submitting} style={{ marginTop: spacing.md }} />
+      <Button title="Email me a sign-in link" icon="mail-outline" variant="outline" color={colors.primary} onPress={onEmailLinkPress} disabled={submitting} style={{ marginTop: spacing.sm }} />
+      <Button title="Continue with Google" icon="logo-google" variant="outline" color={colors.text} onPress={onGooglePress} disabled={submitting} style={{ marginTop: spacing.sm }} />
       <Button
         title="Back"
         variant="ghost"

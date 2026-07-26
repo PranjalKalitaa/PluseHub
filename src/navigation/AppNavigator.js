@@ -1,6 +1,7 @@
-﻿import React from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeFeedScreen from "../screens/Home/HomeFeedScreen";
 import ChallengesScreen from "../screens/Challenges/ChallengesScreen";
@@ -78,6 +79,10 @@ function ProfileStackScreen() {
 }
 
 export default function AppNavigator() {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, 12);
+  const tabHeight = 60 + bottomPadding;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -85,8 +90,16 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused }) => <TabBarIcon route={route} focused={focused} />,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, height: 64, paddingTop: 5, paddingBottom: 6 },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "700" },
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          height: tabHeight,
+          paddingTop: 6,
+          paddingBottom: bottomPadding,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "700", marginBottom: 2 },
       })}
     >
       <Tab.Screen name="Home" component={HomeStackScreen} />
@@ -97,5 +110,3 @@ export default function AppNavigator() {
     </Tab.Navigator>
   );
 }
-
-

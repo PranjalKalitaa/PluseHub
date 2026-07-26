@@ -111,3 +111,11 @@ This build is a fully-wired frontend prototype. To ship it for real:
   dependency-free and instantly runnable.
 - Camera/microphone recording UI is fully wired to Expo's APIs; actual file upload to
   a media server is left as the one integration point for a real backend (see above).
+
+## Supabase authentication setup
+
+PulseHub creates the authentication callback URL at runtime. In an installed app it is `pulsehub://auth/callback`; in Expo Go it is the current `exp://.../--/auth/callback` development URL.
+
+1. In **Authentication / URL Configuration**, add `pulsehub://auth/callback` for installed builds and `exp://**` for Expo Go LAN testing to **Redirect URLs**. Do not use `localhost:3000` as the mobile redirect.
+2. In **Authentication / Providers**, enable and configure Google using your Google OAuth web client credentials.
+3. For Expo Go, start the project with `npx expo start --lan`, keep Expo Go open, and open email links on the same phone. For reliable production redirects, build and install the app later (`npx expo run:android` / `npx expo run:ios` or EAS).

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { View, Text, StyleSheet, ScrollView, Share, Modal, TextInput, TouchableOpacity, ActivityIndicator, Alert, FlatList } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Share, Modal, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -37,6 +37,7 @@ export default function ProfileScreen({ route, navigation }) {
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const pickImage = async () => {
     try {
@@ -82,12 +83,20 @@ export default function ProfileScreen({ route, navigation }) {
   };
 
   const handleSave = async () => {
-    await updateUser({
-      name: editName.trim() || "User",
-      bio: editBio.trim(),
-      avatar: editAvatar,
-    });
-    setModalVisible(false);
+    setSaving(true);
+    try {
+      await updateUser({
+        name: editName.trim() || "User",
+        bio: editBio.trim(),
+        avatar: editAvatar,
+      });
+      setModalVisible(false);
+      Alert.alert("Profile updated", "Your changes have been saved.");
+    } catch (error) {
+      Alert.alert("Could not save profile", error.message || "Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const shareReferral = async () => {
@@ -257,8 +266,9 @@ export default function ProfileScreen({ route, navigation }) {
 
       {/* Edit Profile Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContent}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalBg}>
+          <SafeAreaView edges={["bottom"]} style={styles.modalSafeArea}>
+            <ScrollView contentContainerStyle={styles.modalContent} keyboardShouldPersistTaps="handled">
             <Text style={styles.modalTitle}>Edit Profile</Text>
 
             <Text style={styles.label}>Choose Avatar Icon or Upload Photo</Text>
@@ -313,7 +323,7 @@ export default function ProfileScreen({ route, navigation }) {
             />
 
             <View style={{ marginTop: spacing.md, gap: spacing.sm }}>
-              <Button title="Save Changes" onPress={handleSave} />
+              <Button title="Save Changes" onPress={handleSave} loading={saving} disabled={uploading} />
               <Button
                 title="Cancel"
                 variant="ghost"
@@ -321,8 +331,9 @@ export default function ProfileScreen({ route, navigation }) {
                 onPress={() => setModalVisible(false)}
               />
             </View>
-          </View>
-        </View>
+            </ScrollView>
+          </SafeAreaView>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
@@ -368,6 +379,7 @@ const styles = StyleSheet.create({
 
   // Modal Styles
   modalBg: { flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" },
+  modalSafeArea: { maxHeight: "92%" },
   modalContent: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.lg,
