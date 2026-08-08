@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Video, ResizeMode } from "expo-av";
 import Avatar from "./Avatar";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors, radius, spacing, typography } from "../theme/colors";
 
 export default function ChallengeCard({ post, onLike, isLiked }) {
@@ -26,7 +26,7 @@ export default function ChallengeCard({ post, onLike, isLiked }) {
           <Text style={styles.hashtag}>{post.hashtag}</Text>
         </View>
         <View style={styles.durationPill}>
-          <Ionicons name="time-outline" size={10} color={colors.textMuted} style={{ marginRight: 3 }} />
+          <MaterialCommunityIcons name="timer-outline" size={10} color={colors.textMuted} style={{ marginRight: 3 }} />
           <Text style={styles.durationText}>{post.duration_sec ?? post.durationSec ?? 12}s</Text>
         </View>
       </View>
@@ -51,7 +51,7 @@ export default function ChallengeCard({ post, onLike, isLiked }) {
         {!playing && (
           <View style={styles.videoOverlay}>
             <View style={styles.playCircle}>
-              <Ionicons name="play" size={32} color="#FFFFFF" style={{ marginLeft: 3 }} />
+              <MaterialCommunityIcons name="play" size={32} color="#FFFFFF" style={{ marginLeft: 3 }} />
             </View>
             <Text style={styles.playHint}>Tap to play challenge entry</Text>
           </View>
@@ -62,15 +62,15 @@ export default function ChallengeCard({ post, onLike, isLiked }) {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={handleLike} style={styles.actionBtn}>
-          <Ionicons name={isLiked ? "heart" : "heart-outline"} size={18} color={isLiked ? colors.danger : colors.textMuted} />
+          <MaterialCommunityIcons name={isLiked ? "heart" : "heart-outline"} size={19} color={isLiked ? colors.danger : colors.textMuted} />
           <Text style={[styles.actionText, isLiked && { color: colors.danger }]}>{post.likes}</Text>
         </TouchableOpacity>
         <View style={styles.actionBtn}>
-          <Ionicons name="chatbubble-outline" size={17} color={colors.textMuted} />
+          <MaterialCommunityIcons name="comment-outline" size={18} color={colors.textMuted} />
           <Text style={styles.actionText}>{post.comments}</Text>
         </View>
         <View style={styles.actionBtn}>
-          <Ionicons name="share-social-outline" size={17} color={colors.textMuted} />
+          <MaterialCommunityIcons name="share-variant-outline" size={18} color={colors.textMuted} />
           <Text style={styles.actionText}>Share</Text>
         </View>
       </View>

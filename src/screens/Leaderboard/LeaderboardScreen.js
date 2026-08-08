@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Avatar from "../../components/Avatar";
 import { supabase } from "../../utils/supabase";
 import { useAuth } from "../../context/AuthContext";
@@ -55,7 +55,7 @@ export default function LeaderboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons name="trophy" size={24} color={colors.gold} />
+        <MaterialCommunityIcons name="trophy" size={26} color={colors.gold} />
         <Text style={styles.header}>Leaderboard</Text>
       </View>
       {loading ? (
@@ -79,7 +79,7 @@ export default function LeaderboardScreen() {
                 <Avatar emoji={item.avatar} size={36} />
                 <Text style={styles.name}>{isYou ? "You" : item.name}</Text>
                 <View style={styles.sparksContainer}>
-                  <Ionicons name="flash" size={14} color={colors.gold} style={{ marginRight: 2 }} />
+                  <MaterialCommunityIcons name="lightning-bolt" size={15} color={colors.gold} style={{ marginRight: 2 }} />
                   <Text style={styles.sparks}>{item.sparks}</Text>
                 </View>
               </View>

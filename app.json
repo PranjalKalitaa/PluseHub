@@ -1,32 +1,58 @@
 {
-    "expo":  {
-                 "name":  "PulseHub",
-                 "slug":  "pulsehub",
-                 "version":  "1.0.0",
-                 "scheme":  "pulsehub",
-                 "orientation":  "portrait",
-                 "userInterfaceStyle":  "automatic",
-                 "splash":  {
-                                "backgroundColor":  "#0F0F1A"
-                            },
-                 "assetBundlePatterns":  [
-                                             "**/*"
-                                         ],
-                 "ios":  {
-                             "supportsTablet":  true,
-                             "bundleIdentifier":  "com.pulsehub.app"
-                         },
-                 "android":  {
-                                 "package":  "com.pulsehub.app",
-                                 "permissions":  [
-                                                     "CAMERA",
-                                                     "RECORD_AUDIO"
-                                                 ]
-                             },
-                 "plugins":  [
-                                 "expo-camera",
-                                 "expo-notifications",
-                                 "expo-av"
-                             ]
-             }
+  "expo": {
+    "name": "PulseHub",
+    "slug": "pulsehub",
+    "version": "1.0.0",
+    "scheme": "pulsehub",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0F0F1A",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pulsehub.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "PulseHub needs camera access to record video challenges.",
+        "NSMicrophoneUsageDescription": "PulseHub needs microphone access to record voice notes and challenges.",
+        "NSPhotoLibraryUsageDescription": "PulseHub needs photo library access to upload your profile picture."
+      }
+    },
+    "android": {
+      "package": "com.pulsehub.app",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-camera",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#7C3AED",
+          "androidMode": "default"
+        }
+      ],
+      "expo-av",
+      "expo-image-picker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "pulsehub-app"
+      }
+    }
+  }
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppData } from "../../context/DataContext";
 import { colors, spacing, typography, radius } from "../../theme/colors";
 
@@ -23,11 +23,13 @@ const timeAgo = (dateString) => {
 };
 
 const ICON_CONFIGS = {
-  challenge: { name: "film", color: colors.primary },
-  voice: { name: "mic", color: colors.secondary },
-  story: { name: "book", color: colors.tertiary },
+  challenge: { name: "video", color: colors.primary },
+  voice: { name: "microphone", color: colors.secondary },
+  story: { name: "book-open-page-variant", color: colors.tertiary || "#A855F7" },
   referral: { name: "gift", color: colors.gold },
-  follow: { name: "person-add", color: colors.success },
+  follow: { name: "account-plus", color: colors.success || "#22C55E" },
+  like: { name: "heart", color: "#EF4444" },
+  system: { name: "information", color: colors.textMuted },
 };
 
 export default function NotificationsScreen() {
@@ -58,11 +60,11 @@ export default function NotificationsScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={<Text style={styles.empty}>No notifications yet.</Text>}
         renderItem={({ item }) => {
-          const config = ICON_CONFIGS[item.kind] || { name: "notifications", color: colors.textMuted };
+          const config = ICON_CONFIGS[item.kind] || { name: "bell", color: colors.textMuted };
           return (
-            <View style={styles.row}>
+            <View style={[styles.row, !item.read && styles.rowUnread]}>
               <View style={[styles.iconContainer, { backgroundColor: `${config.color}15` }]}>
-                <Ionicons name={config.name} size={18} color={config.color} />
+                <MaterialCommunityIcons name={config.name} size={18} color={config.color} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.text}>{item.text}</Text>
@@ -91,6 +93,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     gap: spacing.sm,
+  },
+  rowUnread: {
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+    backgroundColor: `${colors.primary}08`,
   },
   iconContainer: {
     width: 38,

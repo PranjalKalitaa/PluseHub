@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Audio } from "expo-av";
 import Avatar from "./Avatar";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors, radius, spacing, typography } from "../theme/colors";
 
 const REACTIONS = [
@@ -72,7 +72,7 @@ export default function VoiceNoteCard({ note, onReact, onDuet, activeReactions =
         </View>
         {(note.duet_of || note.duetOf) && (
           <View style={styles.duetBadge}>
-            <Ionicons name="git-merge-outline" size={12} color={colors.secondary} />
+            <MaterialCommunityIcons name="source-merge" size={12} color={colors.secondary} />
             <Text style={styles.duetBadgeText}>Duet</Text>
           </View>
         )}
@@ -82,7 +82,7 @@ export default function VoiceNoteCard({ note, onReact, onDuet, activeReactions =
 
       <TouchableOpacity style={styles.waveform} onPress={togglePlay} activeOpacity={0.8}>
         <View style={styles.playIconContainer}>
-          <Ionicons name={playing ? "pause" : "play"} size={16} color="#FFFFFF" />
+          <MaterialCommunityIcons name={playing ? "pause" : "play"} size={16} color="#FFFFFF" />
         </View>
         <View style={styles.bars}>
           {Array.from({ length: 24 }).map((_, i) => (
@@ -122,7 +122,7 @@ export default function VoiceNoteCard({ note, onReact, onDuet, activeReactions =
           );
         })}
         <TouchableOpacity style={styles.duetBtn} onPress={() => onDuet?.(note)} activeOpacity={0.85}>
-          <Ionicons name="mic-outline" size={14} color="#ffffff" style={{ marginRight: 4 }} />
+          <MaterialCommunityIcons name="microphone-outline" size={14} color="#ffffff" style={{ marginRight: 4 }} />
           <Text style={styles.duetText}>Reply</Text>
         </TouchableOpacity>
       </View>
